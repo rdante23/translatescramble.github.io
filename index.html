@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#58a700">
+    <meta name="description" content="Thai to English translation game">
+    <title>Translate to English Game</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="icons/icon-192x192.png" type="image/png">
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .game-container {
+            background-color: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .logo {
+            font-size: 48px;
+            color: #58a700;
+            margin-bottom: 20px;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .score-display {
+            background-color: #f8f9fa;
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-weight: bold;
+            color: #58a700;
+            display: flex;
+            align-items: center;
+        }
+        
+        .score-display i {
+            margin-right: 8px;
+            color: #ffc107;
+        }
+        
+        .time-display {
+            background-color: #f8f9fa;
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-weight: bold;
+            color: #007bff;
+        }
+        
+        .control-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .control-button {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 8px 16px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        
+        h1 {
+            color: #58a700;
+            margin-bottom: 30px;
+            font-size: 24px;
+        }
+        
+        .thai-sentence {
+            font-size: 28px;
+            margin: 30px 0;
+            color: #333;
+            min-height: 80px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .listen-button {
+            background-color: #58a700;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            transition: background-color 0.2s;
+        }
+        
+        .listen-button:hover {
+            background-color: #4d9500;
+        }
+        
+        .listen-button i {
+            margin-right: 8px;
+        }
+        
+        .translation-area {
+            background-color: #f7f7f7;
+            border-radius: 12px;
+            padding: 15px;
+            min-height: 60px;
+            margin-bottom: 30px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .word-option {
+            background-color: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .word-option:hover {
+            background-color: #f0f0f0;
+        }
+        
+        .word-option.selected {
+            background-color: #e1f0ff;
+            border-color: #a0d0ff;
+        }
+        
+        .word-option.used {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        
+        .check-button {
+            background-color: #58a700;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.2s;
+        }
+        
+        .check-button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        
+        .check-button:hover:not(:disabled) {
+            background-color: #4d9500;
+        }
+        
+        .feedback {
+            font-size: 20px;
+            font-weight: bold;
+            margin: 20px 0;
+            min-height: 30px;
+        }
+        
+        .correct {
+            color: #58a700;
+        }
+        
+        .incorrect {
+            color: #ff4d4d;
+        }
+        
+        .continue-button {
+            background-color: #58a700;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.2s;
+        }
+        
+        .continue-button:hover {
+            background-color: #4d9500;
+        }
+        
+        .hidden {
+            display: none;
+        }
+
+        /* Welcome screen styles */
+        .welcome-screen {
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .welcome-title {
+            color: #58a700;
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+
+        .difficulty-options {
+            margin: 30px 0;
+            text-align: left;
+        }
+
+        .difficulty-option {
+            display: block;
+            margin: 15px 0;
+            padding: 12px 20px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+        }
+
+        .difficulty-option:hover {
+            background-color: #e1f0ff;
+        }
+
+         .difficulty-option.selected {
+            background-color: #e1f0ff;
+            border-left: 4px solid #58a700;
+        }
+
+          .difficulty-option input {
+            margin-right: 10px;
+        }
+
+        .start-button {
+            background-color: #58a700;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.2s;
+        }
+
+        .start-button:hover {
+            background-color: #4d9500;
+        }
+
+        /* End game modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            display: none;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .modal-title {
+            color: #58a700;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .modal-score {
+            font-size: 36px;
+            font-weight: bold;
+            color: #007bff;
+            margin: 10px 0;
+        }
+
+        .modal-stats {
+            margin: 15px 0;
+            font-size: 18px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .modal-button {
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .play-again {
+            background-color: #58a700;
+            color: white;
+            border: none;
+        }
+
+        .back-to-menu {
+            background-color: white;
+            color: #333;
+            border: 2px solid #e0e0e0;
+        }
+
+        /* Install prompt */
+        .install-prompt {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            display: none;
+            z-index: 1000;
+            max-width: 90%;
+        }
+
+        .install-prompt button {
+            background-color: #58a700;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 16px;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+
+        /* Mobile styles */
+        @media (max-width: 600px) {
+            .game-container {
+                padding: 20px;
+            }
+            
+            .thai-sentence {
+                font-size: 22px;
+            }
+            
+            .word-option {
+                padding: 8px 12px;
+                font-size: 14px;
+            }
+            
+            .check-button, .continue-button, .start-button {
+                padding: 12px 30px;
+                font-size: 16px;
+            }
+            
+            .control-buttons {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .control-button {
+                width: 100%;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <!-- Welcome Screen -->
+    <div class="welcome-screen" id="welcomeScreen">
+        <div class="logo">
+            <i class="fas fa-language"></i>
+        </div>
+        <div class="welcome-title">Translate to English</div>
+        <p>Select difficulty level and start playing!</p>
+        
+        <div class="difficulty-options">
+            <label class="difficulty-option" onclick="selectDifficulty(1)">
+                <input type="radio" name="difficulty" checked> Level 1 - Basic
+            </label>
+            <label class="difficulty-option" onclick="selectDifficulty(2)">
+                <input type="radio" name="difficulty"> Level 2 - Easy
+            </label>
+            <label class="difficulty-option" onclick="selectDifficulty(3)">
+                <input type="radio" name="difficulty"> Level 3 - Medium
+            </label>
+            <label class="difficulty-option" onclick="selectDifficulty(4)">
+                <input type="radio" name="difficulty"> Level 4 - Hard
+            </label>
+            <label class="difficulty-option" onclick="selectDifficulty(5)">
+                <input type="radio" name="difficulty"> Level 5 - Expert
+            </label>
+            <label class="difficulty-option" onclick="selectDifficulty(6)">
+                <input type="radio" name="difficulty"> Level 6 - Master
+            </label>
+        </div>
+
+        <div style="margin: 20px 0;">
+            <input type="checkbox" id="randomizeCheckbox">
+            <label for="randomizeCheckbox">Randomize sentence order</label>
+        </div>
+
+        <button class="start-button" onclick="startGame()">Start Game</button>
+    </div>
+
+    <!-- Game Container -->
+    <div class="game-container hidden" id="gameContainer">
+        <div class="logo">
+            <i class="fas fa-language"></i>
+        </div>
+        
+        <div class="header">
+            <div class="score-display">
+                <i class="fas fa-star"></i>
+                <span id="score">0</span>
+            </div>
+            <div class="time-display">
+                <span id="timer">0.0s</span>
+            </div>
+        </div>
+        
+        <div class="control-buttons">
+            <button class="control-button" id="pauseButton" onclick="togglePause()">
+                <i class="fas fa-pause"></i> Pause
+            </button>
+            <button class="control-button" id="resumeButton" onclick="togglePause()" style="display: none;">
+                <i class="fas fa-play"></i> Resume
+            </button>
+            <button class="control-button" onclick="quitGame()">
+                <i class="fas fa-sign-out-alt"></i> Quit
+            </button>
+        </div>
+        
+        <h1>Translate this sentence</h1>
+        
+        <div class="thai-sentence" id="thaiSentence"></div>
+        
+        <button class="listen-button" id="listenButton">
+            <i class="fas fa-volume-up"></i> Listen
+        </button>
+        
+        <div class="translation-area" id="translationArea"></div>
+        
+        <div id="wordOptions" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 20px;"></div>
+        
+        <div class="feedback" id="feedback"></div>
+        
+        <button class="check-button" id="checkButton" onclick="checkAnswer()" disabled>Check</button>
+        <button class="continue-button hidden" id="continueButton" onclick="nextQuestion()">CONTINUE</button>
+    </div>
+
+    <!-- End Game Modal -->
+    <div class="modal-overlay" id="endGameModal">
+        <div class="modal-content">
+            <div class="modal-title">Game Completed!</div>
+            <div class="modal-score" id="finalScore">0</div>
+            <div class="modal-stats" id="finalStats"></div>
+            <div class="modal-buttons">
+                <button class="modal-button play-again" onclick="playAgain()">
+                    <i class="fas fa-redo"></i> Play Again
+                </button>
+                <button class="modal-button back-to-menu" onclick="backToMenu()">
+                    <i class="fas fa-home"></i> Back to Menu
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Install Prompt -->
+    <div class="install-prompt" id="installPrompt">
+        <span>Install this app for a better experience?</span>
+        <button id="installButton">Install</button>
+        <button id="dismissInstall">No Thanks</button>
+    </div>
+
+    <script>
+        // Questions organized by difficulty level
+        const questionsByLevel = {
+            1: [
+                { thai: "สุนัข", english: "dog", options: ["dog", "cat", "animal"] },
+                { thai: "แมว", english: "cat", options: ["cat", "dog", "pet"] },
+                { thai: "หนังสือ", english: "book", options: ["book", "read", "paper"] }
+            ],
+            2: [
+                { thai: "ฉันกินข้าว", english: "I eat rice", options: ["I", "eat", "rice", "food"] },
+                { thai: "เธอชอบชา", english: "She likes tea", options: ["She", "likes", "tea", "drink"] },
+                { thai: "เราอาศัยในกรุงเทพฯ", english: "We live in Bangkok", options: ["We", "live", "in", "Bangkok"] }
+            ],
+            3: [
+                { thai: "เด็กผู้ชายกำลังเล่นฟุตบอล", english: "The boy is playing football", options: ["The", "boy", "is", "playing", "football"] },
+                { thai: "ฉันกำลังอ่านหนังสือ", english: "I am reading a book", options: ["I", "am", "reading", "a", "book"] },
+                { thai: "แม่กำลังทำอาหาร", english: "Mother is cooking food", options: ["Mother", "is", "cooking", "food"] }
+            ],
+            4: [
+                { thai: "เมื่อวานฉันไปตลาด", english: "Yesterday I went to the market", options: ["Yesterday", "I", "went", "to", "the", "market"] },
+                { thai: "เธอกินข้าวเช้าแล้ว", english: "She ate breakfast", options: ["She", "ate", "breakfast", "morning"] },
+                { thai: "เราเล่นเกมเมื่อคืน", english: "We played games last night", options: ["We", "played", "games", "last", "night"] }
+            ],
+            5: [
+                { thai: "พรุ่งนี้ฉันจะไปเที่ยว", english: "Tomorrow I will travel", options: ["Tomorrow", "I", "will", "travel"] },
+                { thai: "เธอจะมาพรุ่งนี้", english: "She will come tomorrow", options: ["She", "will", "come", "tomorrow"] },
+                { thai: "เราจะซื้อบ้านใหม่", english: "We will buy a new house", options: ["We", "will", "buy", "a", "new", "house"] }
+            ],
+            6: [
+                { thai: "ถ้าฝนไม่ตก เราจะไปเที่ยวทะเล", english: "If it doesn't rain, we will go to the beach", options: ["If", "it", "doesn't", "rain", "we", "will", "go", "to", "the", "beach"] },
+                { thai: "เธอควรจะไปพบแพทย์", english: "She should see a doctor", options: ["She", "should", "see", "a", "doctor"] },
+                { thai: "ฉันอยากไปญี่ปุ่นปีหน้า", english: "I want to go to Japan next year", options: ["I", "want", "to", "go", "to", "Japan", "next", "year"] }
+            ]
+        };
+
+        let currentQuestion = 0;
+        let selectedWords = [];
+        let score = 0;
+        let correctAnswers = 0;
+        let startTime;
+        let timerInterval;
+        let selectedDifficulty = 1;
+        let randomizeOrder = false;
+        let currentQuestions = [];
+        let isPaused = false;
+        let pauseTime;
+        let totalPausedTime = 0;
+        let deferredPrompt;
+
+        // Initialize the game
+        function initGame() {
+            document.getElementById('welcomeScreen').classList.remove('hidden');
+            document.getElementById('gameContainer').classList.add('hidden');
+            document.getElementById('endGameModal').style.display = 'none';
+        }
+
+        // Select difficulty level
+        function selectDifficulty(level) {
+            selectedDifficulty = level;
+        }
+
+        // Start the game
+        function startGame() {
+            randomizeOrder = document.getElementById('randomizeCheckbox').checked;
+            currentQuestions = [...questionsByLevel[selectedDifficulty]];
+            correctAnswers = 0;
+            
+            if (randomizeOrder) {
+                shuffleQuestions();
+            }
+            
+            document.getElementById('welcomeScreen').classList.add('hidden');
+            document.getElementById('gameContainer').classList.remove('hidden');
+            document.getElementById('endGameModal').style.display = 'none';
+            
+            score = 0;
+            document.getElementById('score').textContent = score;
+            
+            currentQuestion = 0;
+            displayQuestion(currentQuestion);
+        }
+
+        // Shuffle questions
+        function shuffleQuestions() {
+            for (let i = currentQuestions.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [currentQuestions[i], currentQuestions[j]] = [currentQuestions[j], currentQuestions[i]];
+            }
+        }
+
+        // Display a question
+        function displayQuestion(index) {
+            if (index >= currentQuestions.length) {
+                endGame();
+                return;
+            }
+            
+            const question = currentQuestions[index];
+            document.getElementById('thaiSentence').textContent = question.thai;
+            
+            // Clear translation area
+            const translationArea = document.getElementById('translationArea');
+            translationArea.innerHTML = '';
+            selectedWords = [];
+            
+            // Reset word options
+            const wordOptionsContainer = document.getElementById('wordOptions');
+            wordOptionsContainer.innerHTML = '';
+            
+            // Shuffle options
+            const shuffledOptions = [...question.options].sort(() => Math.random() - 0.5);
+            
+            // Create word options
+            shuffledOptions.forEach(word => {
+                const wordOption = document.createElement('div');
+                wordOption.className = 'word-option';
+                wordOption.textContent = word;
+                wordOption.onclick = function() { selectWord(this); };
+                wordOptionsContainer.appendChild(wordOption);
+            });
+            
+            // Reset buttons and feedback
+            document.getElementById('checkButton').disabled = true;
+            document.getElementById('checkButton').classList.remove('hidden');
+            document.getElementById('continueButton').classList.add('hidden');
+            document.getElementById('feedback').textContent = '';
+            document.getElementById('feedback').className = 'feedback';
+            
+            // Reset pause state
+            isPaused = false;
+            totalPausedTime = 0;
+            document.getElementById('pauseButton').style.display = 'inline-block';
+            document.getElementById('resumeButton').style.display = 'none';
+            
+            // Start timer for this question
+            startTimer();
+        }
+
+        // Start the timer
+        function startTimer() {
+            startTime = new Date();
+            timerInterval = setInterval(updateTimer, 100);
+        }
+
+        // Update the timer
+        function updateTimer() {
+            if (!isPaused) {
+                const currentTime = new Date();
+                const elapsedTime = (currentTime - startTime - totalPausedTime) / 1000;
+                document.getElementById('timer').textContent = elapsedTime.toFixed(1) + "s";
+            }
+        }
+
+        // Stop the timer
+        function stopTimer() {
+            clearInterval(timerInterval);
+        }
+
+        // Toggle pause state
+        function togglePause() {
+            isPaused = !isPaused;
+            
+            if (isPaused) {
+                pauseTime = new Date();
+                document.getElementById('pauseButton').style.display = 'none';
+                document.getElementById('resumeButton').style.display = 'inline-block';
+            } else {
+                totalPausedTime += new Date() - pauseTime;
+                document.getElementById('pauseButton').style.display = 'inline-block';
+                document.getElementById('resumeButton').style.display = 'none';
+            }
+        }
+
+        // Quit the game
+        function quitGame() {
+            if (confirm("Are you sure you want to quit? Your progress will be lost.")) {
+                endGame();
+            }
+        }
+
+        // Select a word
+        function selectWord(element) {
+            if (element.classList.contains('used') || isPaused) return;
+            
+            selectedWords.push(element.textContent);
+            element.classList.add('used');
+            element.classList.add('selected');
+            
+            const translationArea = document.getElementById('translationArea');
+            const wordSpan = document.createElement('span');
+            wordSpan.className = 'word-option selected';
+            wordSpan.textContent = element.textContent;
+            wordSpan.onclick = function() { removeWord(this, element); };
+            translationArea.appendChild(wordSpan);
+            
+            document.getElementById('checkButton').disabled = selectedWords.length === 0;
+        }
+
+        // Remove a word
+        function removeWord(translationWord, originalWord) {
+            if (isPaused) return;
+            
+            const wordIndex = selectedWords.indexOf(translationWord.textContent);
+            if (wordIndex > -1) {
+                selectedWords.splice(wordIndex, 1);
+            }
+            
+            translationWord.remove();
+            
+            if (originalWord) {
+                originalWord.classList.remove('used');
+                originalWord.classList.remove('selected');
+            }
+            
+            document.getElementById('checkButton').disabled = selectedWords.length === 0;
+        }
+
+        // Check the answer
+        function checkAnswer() {
+            if (isPaused) return;
+            
+            stopTimer();
+            const endTime = new Date();
+            const timeTaken = (endTime - startTime - totalPausedTime) / 1000;
+            
+            const userAnswer = selectedWords.join(' ');
+            const correctAnswer = currentQuestions[currentQuestion].english;
+            
+            const feedbackElement = document.getElementById('feedback');
+            
+            if (userAnswer.toLowerCase() === correctAnswer.toLowerCase()) {
+                feedbackElement.textContent = 'Correct!';
+                feedbackElement.className = 'feedback correct';
+                
+                // Calculate score based on time
+                const questionScore = Math.max(20, 100 - Math.floor(timeTaken * 2));
+                score += questionScore;
+                correctAnswers++;
+                document.getElementById('score').textContent = score;
+            } else {
+                feedbackElement.textContent = `Correct answer: ${correctAnswer}`;
+                feedbackElement.className = 'feedback incorrect';
+            }
+            
+            document.getElementById('checkButton').classList.add('hidden');
+            document.getElementById('continueButton').classList.remove('hidden');
+        }
+
+        // Go to next question
+        function nextQuestion() {
+            currentQuestion++;
+            displayQuestion(currentQuestion);
+        }
+
+        // End the game
+        function endGame() {
+            stopTimer();
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('finalStats').textContent = 
+                `You got ${correctAnswers} out of ${currentQuestions.length} sentences correct!`;
+            document.getElementById('gameContainer').classList.add('hidden');
+            document.getElementById('endGameModal').style.display = 'flex';
+        }
+
+        // Play again
+        function playAgain() {
+            startGame();
+        }
+
+        // Back to menu
+        function backToMenu() {
+            initGame();
+        }
+
+        // Play audio
+        document.getElementById('listenButton').addEventListener('click', function() {
+            if (isPaused) return;
+            console.log('Playing audio for:', currentQuestions[currentQuestion].thai);
+            alert('Audio would play here in a real implementation');
+        });
+
+        // PWA Installation Handling
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Prevent the mini-infobar from appearing on mobile
+            e.preventDefault();
+            // Stash the event so it can be triggered later
+            deferredPrompt = e;
+            // Show the install button
+            document.getElementById('installPrompt').style.display = 'block';
+        });
+
+        document.getElementById('installButton').addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    console.log('User accepted the install prompt');
+                } else {
+                    console.log('User dismissed the install prompt');
+                }
+                deferredPrompt = null;
+                document.getElementById('installPrompt').style.display = 'none';
+            }
+        });
+
+        document.getElementById('dismissInstall').addEventListener('click', () => {
+            document.getElementById('installPrompt').style.display = 'none';
+        });
+
+        // Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').then(registration => {
+                    console.log('ServiceWorker registration successful');
+                }).catch(err => {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+            });
+        }
+
+        // Initialize the game
+        window.onload = initGame;
+    </script>
+</body>
+</html>
